@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
+#include <iostream>
 using namespace std;
 
 
@@ -98,9 +99,40 @@ struct buddyAlloc {
 		item->Next = freeBlocks[item->Level];
 		freeBlocks[item->Level] = item;
 	}
+
+	string dump() {
+		string result = "";
+		for (int i = 23; i > 0; i--)
+		{
+			cout << "Level " << i;
+			if (freeBlocks[i] != freeBlocks[0]) {
+				auto free = freeBlocks[i];
+				cout << " " << free;
+				while (free->Next != freeBlocks[0]) {
+					cout << " " << free;
+					free = free->Next;
+				}
+			}
+			cout << "\n";
+		}
+		cout << "\n";
+		return result;
+	}
 };
 
 
 int main(int argc, char *argv[]) {
 	buddyAlloc* allocator = new buddyAlloc();
+	auto a = allocator->allocate(28);
+	auto b = allocator->allocate(56);
+	auto c = allocator->allocate(15);
+	allocator->dump();
+	allocator->deallocate(b);
+	allocator->deallocate(c);
+	allocator->dump();
+	auto d = allocator->allocate(15);
+	allocator->deallocate(a);
+	allocator->dump();
+	allocator->deallocate(d);
+	allocator->dump();
 }
