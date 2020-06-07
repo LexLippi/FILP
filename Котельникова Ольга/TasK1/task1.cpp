@@ -33,7 +33,7 @@ struct Comparator
 		return strcmp(left, right.word) < 0;
 	}
 
-	
+
 
 	bool operator()(const Item left, const Item right)
 	{
@@ -41,7 +41,7 @@ struct Comparator
 	}
 };
 
-struct OtherComparator
+struct ComparatorForCount
 {
 	bool operator()(const int left, const Item right)
 	{
@@ -83,13 +83,13 @@ char* getText(char* fileName)
 
 std::set<Item, Comparator> parse(char* buffer)
 {
-	
+
 	char *word;
 	size_t length = 0;
 	size_t startInd = 0;
 	size_t finishInd = 0;
-	
-	
+
+
 	std::set<Item, Comparator> Dict;
 	for (size_t i = 0; i < SIZE; i++)
 	{
@@ -97,7 +97,7 @@ std::set<Item, Comparator> parse(char* buffer)
 		{
 			if (isalpha(buffer[i - 1]))
 			{
-				
+
 				word = (char*)malloc(length);
 				for (size_t j = 0; j < length; j++)
 				{
@@ -132,7 +132,7 @@ std::set<Item, Comparator> parse(char* buffer)
 	auto item = Dict.find(word);
 	if (item != Dict.end())
 		item->count = item->count + 1;
-	
+
 	else
 	{
 		Item item = Item(word);
@@ -157,9 +157,9 @@ void printSlice(size_t start, size_t finish, char* buffer)
 	}
 }
 
-std::set<Item, OtherComparator> sorting(std::set<Item, Comparator> map)
+std::set<Item, ComparatorForCount> sorting(std::set<Item, Comparator> map)
 {
-	std::set<Item, OtherComparator> map2;
+	std::set<Item, ComparatorForCount> map2;
 	for (Item item : map)
 	{
 		map2.insert(item);
@@ -174,7 +174,7 @@ std::map<std::string, size_t> handleStd(char* buffer)
 	size_t length = 0;
 	std::string word;
 	std::map<std::string, size_t> Dict = std::map<std::string, size_t>();
-	
+
 	for (int i = 0; i < SIZE; i++)
 	{
 		if (!isalpha(buffer[i]) and buffer[i] != '-')
@@ -190,7 +190,7 @@ std::map<std::string, size_t> handleStd(char* buffer)
 					item->second = item->second + 1;
 
 				else
-				
+
 					Dict.insert(std::pair<std::string, size_t>(word, 1));
 			}
 			startInd = i + 1;
@@ -211,13 +211,13 @@ std::map<std::string, size_t> handleStd(char* buffer)
 	}
 	auto item = Dict.find(word);
 	if (item != Dict.end())
-	
+
 		item->second = item->second + 1;
-	
+
 	else
-	
+
 		Dict.insert(std::pair<std::string, size_t>(word, 1));
-	
+
 	return Dict;
 }
 
@@ -227,11 +227,13 @@ int main()
 {
 	char* fileName = "text.txt";
 	char* content = getText(fileName);
-	
+	size_t fileSize = getFileSize(fileName);
+	cout << "Filename = " << fileName << ", size of file = " << fileSize;
+
 	clock_t start = clock();
 	const std::set<Item, Comparator> dictionary = parse(content);
 	clock_t finish = clock();
-	
+
 	for (Item i : dictionary)
 	{
 		cout << i.word << " - " << i.count;
@@ -249,7 +251,7 @@ int main()
 	double t2 = ((double)(finish2 - start2) * 1000) / CLOCKS_PER_SEC;
 	cout << t1 << " user allocator ";
 	cout << t2 << " std::map";
-	std::set<Item, OtherComparator> map = sorting(dictionary);
+	std::set<Item, ComparatorForCount> map = sorting(dictionary);
 	for (Item item : map)
 	{
 		cout << item.word << " - " << item.count;
