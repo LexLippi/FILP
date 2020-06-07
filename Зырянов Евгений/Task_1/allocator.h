@@ -1,31 +1,22 @@
+#include "buffer.h"
+
 template <class T>
 struct Allocator {
     typedef T value_type;
     typedef T* pointer;
-    typedef size_t size_type;
 
-private:
-    void* ptr;
-    size_t position;
-
-public:
+    BufferList* buffers;
     Allocator() {
-        ptr = malloc(1024 * 1024);
-        position = 0;
+        buffers = new BufferList();
     }
 
-    pointer allocate(size_t size) {
-        pointer result = ((pointer)ptr) + position;
-        position += size;
-
-        return result;
+    pointer allocate(size_t n) {
+        return reinterpret_cast<pointer>(buffers->allocate(n, sizeof(value_type)));
     }
 
-    void deallocate(pointer p, size_t size) {
-        position -= size;
-    }
+    void deallocate(pointer p, size_t n) { }
 
     ~Allocator() {
-        free(ptr);
+        delete buffers;
     }
 };
