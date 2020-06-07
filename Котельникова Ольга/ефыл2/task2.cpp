@@ -158,7 +158,8 @@ public:
 
 int main()
 {
-  auto allocator = UserBuddyAllocator(20);
+	
+	auto allocator = UserBuddyAllocator(20);
 	auto x = allocator.allocate(1);
 	auto y = allocator.allocate(5);
 	auto z = allocator.allocate(10);
