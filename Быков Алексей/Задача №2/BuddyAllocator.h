@@ -1,6 +1,10 @@
 #pragma once
 //#include <intrin.h>
 
+/* Работоспособность программы можно проверить на первом задании 
+ * подключив вместо allocator.h данную библиотеку
+ */
+
 struct segment {
 	char* start;
 	segment* buddy, * parent;
