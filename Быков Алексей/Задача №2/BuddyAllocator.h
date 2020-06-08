@@ -1,6 +1,5 @@
 #pragma once
-#include <intrin.h>
-/* Works with task №1 */
+//#include <intrin.h>
 
 struct segment {
 	char* start;
@@ -133,9 +132,21 @@ const size_t mxdegree = 21;
 template<class T>
 class MyAlloc {
 private:
+	/* "Added" from intrin.h */
+	unsigned char bsr(unsigned long &index, size_t mask) {
+		unsigned char res = 0;
+		for (index = mxdegree; index >= 0; --index) {
+			if (mask & (1 << index)) {
+				res = 1;
+				break;
+			}
+		}
+		return res;
+	}
+
 	size_t getsize2(size_t msize) {
 		unsigned long index;
-		unsigned char non_zero = _BitScanReverse(&index, msize);
+		unsigned char non_zero = bsr(index, msize);
 		if (non_zero && (1 << index) != msize)
 			index++;
 		return (non_zero ? index : -1);
