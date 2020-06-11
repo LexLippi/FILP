@@ -90,8 +90,6 @@ private:
 };
 
 
-
-
 class WordSelectionResult
 {
 public:
@@ -146,7 +144,10 @@ struct HashFunc {
 HFILE GetFileHandle(char* fileName)
 {
 	OFSTRUCT buffer;
-	return OpenFile(fileName, &buffer, OF_READ);
+	HFILE handle = OpenFile(fileName, &buffer, OF_READ);
+	if(handle == -1)
+		throw new exception("Can't open the file");
+	return handle;
 }
 
 unsigned int GetFileSize(HANDLE handle)
@@ -154,7 +155,6 @@ unsigned int GetFileSize(HANDLE handle)
 	LARGE_INTEGER sizeStruct;
 	if (GetFileSizeEx(handle, &sizeStruct))
 		return sizeStruct.QuadPart;
-	throw new exception("Can't get file size");
 }
 
 void ReadFile(HANDLE handle, char* buffer, unsigned int fileSize)
@@ -166,13 +166,6 @@ void ReadFile(HANDLE handle, char* buffer, unsigned int fileSize)
 
 #pragma endregion
 
-template<typename keyType, typename valueType>
-void InsertValueToMapUsingAllocator(
-	unordered_map<keyType, valueType>* u_map, keyType& key, valueType& value,
-	CustomAllocator<keyType>* allocator)
-{
-
-}
 
 char* AskUserForFileName()
 {
@@ -213,13 +206,14 @@ unordered_map<keyValue, unsigned int, HashFuncType, EqualFuncType, AllocType>* C
 	unsigned int textPosition = 0;
 	auto wordSelectResult = new WordSelectionResult();
 
-	while (true)
+	while (textPosition < textSize)
 	{
 		SelectWord(text, wordSelectResult, textPosition, textSize);
-		if (!wordSelectResult->Success())
-			break;
-		text[wordSelectResult->endIndex + 1] = '\0';
-		AddWord(text, wordSelectResult, wordStat);
+		if (wordSelectResult->Success())
+		{
+			text[wordSelectResult->endIndex + 1] = '\0';
+			AddWord(text, wordSelectResult, wordStat);
+		}
 	}
 	return wordStat;
 }
@@ -236,10 +230,13 @@ void AddCharStringToWordStat(char* text, WordSelectionResult* wordSelectResult,
 void AddStdStringToWordStat(char* text, WordSelectionResult* wordSelectResult,
 	unordered_map<string, unsigned int, hash<string>, equal_to<string>, allocator<pair<string, unsigned int>>>* wordStat)
 {
-	if (wordStat->find(string(&text[wordSelectResult->startIndex])) == wordStat->end())
-		(*wordStat)[string(&text[wordSelectResult->startIndex])] = 1;
+	string word = "";
+	for (unsigned int i = wordSelectResult->startIndex; i <= wordSelectResult->endIndex; ++i)
+		word += text[i];
+	if (wordStat->find(word) == wordStat->end())
+		(*wordStat)[word] = 1;
 	else
-		++(*wordStat)[string(&text[wordSelectResult->startIndex])];
+		++(*wordStat)[word];
 }
 
 template<typename T>
@@ -308,9 +305,9 @@ int main()
 
 		delete wordStat1, wordStat2;
 	}
-	catch (exception& e)
+	catch (...)
 	{
-		cout << e.what();
+		cout << "Something wrong";
 	}
 	return 0;
 }
