@@ -67,10 +67,10 @@ public:
 
 	pointer allocate(std::size_t size)
 	{
-		if (bufferPosition + size >= bufferSize)
+		if (bufferPosition + size * sizeof(T) >= bufferSize)
 			allocateNewBuffer();
 		T* pointer = ((T*)currentBuffer + bufferPosition);
-		bufferPosition += size;
+		bufferPosition += size * sizeof(T);
 		return pointer;
 	}
 
