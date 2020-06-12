@@ -76,7 +76,7 @@ public:
 
 	void deallocate(void* p, std::size_t size)
 	{
-		bufferPosition -= size;
+		
 	}
 
 private:
