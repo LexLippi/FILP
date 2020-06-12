@@ -69,7 +69,7 @@ public:
 	{
 		if (bufferPosition + size * sizeof(T) >= bufferSize)
 			allocateNewBuffer();
-		T* pointer = ((T*)currentBuffer + bufferPosition);
+		T* pointer = (T*)((char*)currentBuffer + bufferPosition);
 		bufferPosition += size * sizeof(T);
 		return pointer;
 	}
