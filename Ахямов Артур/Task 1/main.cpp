@@ -177,7 +177,7 @@ char* AskUserForFileName()
 
 void PrintFileSize(unsigned int fileSize)
 {
-	cout << "File size: " << fileSize << "\n-----------------------------------------------------\n";
+	cout << "File size: " << fileSize << " bytes\n-----------------------------------------------------\n";
 }
 
 void SelectWord(
@@ -304,6 +304,7 @@ int main()
 			"\nStandart allocator = " << algDurationUsingStandartAllocator << " ms" << "\n";
 
 		delete wordStat1, wordStat2;
+		CloseHandle((HANDLE)handle);
 	}
 	catch (...)
 	{
